@@ -5,10 +5,16 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "outDir": "./dist",
-    "sourceMap": true
+    "sourceMap": true,
+    "target": "ES2015"
   },
   "include": [
     "src/**/*"
+  ],
+  "files": [
+    "src/index.ts"
+  ],
+  "lib": [
   ],
   "exclude": [
     "node_modules",
