@@ -1,6 +1,7 @@
 import { expect } from 'chai';
+import { stub } from 'sinon';
 
-import { Maybe, none, Some } from '../src/maybe';
+import { Maybe, none } from '../src/maybe';
 import { Generators, Generator } from '../src';
 
 describe('Generators', () => {
@@ -20,14 +21,10 @@ describe('Generators', () => {
     });
 
     it('should produce a random value within a range', () => {
-      //TODO: Use sinon.js
-      let originalMathRandom = Math.random;
-      Math.random = () => 0.5;
+      stub(Math, 'random').returns(0.5);
       let generator: Generator<number> = Generators.choose(0, 10);
 
       expect(generator.generate()).to.eql(Maybe.from(5));
-
-      Math.random = originalMathRandom;
     });
   });
 
