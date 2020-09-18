@@ -30,7 +30,7 @@ export class None<T> extends Maybe<T> {
     super();
   }
   get value(): T {
-    throw new Error('None: value is not defined');
+    throw new Error('None: accessing undefined value');
   }
   isDefined = false
   map<U>(f: (value: T) => U): Maybe<U> {
