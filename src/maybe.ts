@@ -3,6 +3,9 @@ export abstract class Maybe<T> {
   abstract value: T
   abstract map<U>(f: (value: T) => U): Maybe<U>
   abstract flatMap<U>(f: (value: T) => Maybe<U>): Maybe<U>
+  get(): T {
+    return this.value;
+  }
   static from<U>(value: U): Maybe<U> {
     if (value !== undefined && value !== null) {
       return new Some(value);
