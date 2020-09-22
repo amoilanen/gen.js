@@ -84,4 +84,20 @@ export class Generators {
       }
     });
   }
+
+  static object<T1, T2, T3, T4, U>(g1: Generator<T1>, g2: Generator<T2>, g3: Generator<T3>, g4: Generator<T4>, objectConstructor: new (x1: T1, x2: T2, x3: T3, x4: T4) => U): Generator<U> {
+    return new (class extends Generator<U> {
+      generate(): Maybe<U> {
+        return g1.generate().flatMap(x1 =>
+          g2.generate().flatMap(x2 =>
+            g3.generate().flatMap(x3 =>
+              g4.generate().map(x4 =>
+                new objectConstructor(x1, x2, x3, x4)
+              )
+            )
+          )
+        )
+      }
+    });
+  }
 };
