@@ -26,11 +26,11 @@ let person = new Person(name.get(), surname.get(), age.get(), city.get());
 */
 
 let person = Generators.object(
+  Person,
   Generators.oneOfValues(...names),
   Generators.oneOfValues(...surnames),
   Generators.choose(0, 120).map(age => Math.floor(age)),
-  Generators.oneOfValues(...cities),
-  Person
+  Generators.oneOfValues(...cities)
 ).generate();
 
 console.log(person.get());
