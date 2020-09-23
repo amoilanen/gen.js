@@ -56,4 +56,6 @@ describe('Maybe', () => {
       expect(none.flatMap(x => new Some(2 * x))).to.equal(none);
     });
   });
+
+  //TODO: Verify monadic laws
 });

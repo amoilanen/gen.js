@@ -1,7 +1,5 @@
 import { Maybe, Some, none } from './maybe';
 
-//TODO: Add tests for the methods added as a result of a quick spike/prototyping
-
 export abstract class Generator<T> {
 
   abstract generate(): Maybe<T>
@@ -15,8 +13,14 @@ export abstract class Generator<T> {
     });
   }
 
-  //TODO:
-  //flatMap
+  flatMap<U>(f: (value: T) => Generator<U>): Generator<U> {
+    let original = this;
+    return new (class extends Generator<U> {
+      generate() {
+        return original.generate().flatMap(x => f(x).generate());
+      }
+    });
+  }
 }
 
 type G<T> = Generator<T>
@@ -48,7 +52,8 @@ export class Generators {
     });
   }
 
-  static forValue<T>(value: T): Generator<T> {
+  //TODO: Add tests for the methods added as a result of a quick spike/prototyping
+  static pure<T>(value: T): Generator<T> {
     let generatedValue = new Some(value);
     return new (class extends Generator<T> {
 
@@ -59,7 +64,7 @@ export class Generators {
   }
 
   static oneOfValues<T>(...values: Array<T>): Generator<T> {
-    let generators = values.map(value => this.forValue(value));
+    let generators = values.map(value => this.pure(value));
     return this.oneOf(...generators);
   }
 
@@ -104,7 +109,6 @@ export class Generators {
     g1: G<T1>, g2: G<T2>, g3: G<T3>, g4: G<T4>, g5: G<T5>, g6: G<T6>, g7: G<T7>, g8: G<T8>, g9: G<T9>): G<R>
   static object<R, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(objectConstructor: new (x1: T1, x2: T2, x3: T3, x4: T4, x5: T5, x6: T6, x7: T7, x8: T8, x9: T9, x10: T10) => R,
     g1: G<T1>, g2: G<T2>, g3: G<T3>, g4: G<T4>, g5: G<T5>, g6: G<T6>, g7: G<T7>, g8: G<T8>, g9: G<T9>, g10: G<T10>): G<R>
-
 
   static object<R>(objectConstructor: new (...args: any[]) => R, ...fieldGenerators: Array<Generator<any>>): Generator<R> {
     return new (class extends Generator<R> {
