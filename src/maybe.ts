@@ -6,7 +6,7 @@ export abstract class Maybe<T> {
   get(): T {
     return this.value;
   }
-  static from<U>(value: U): Maybe<U> {
+  static pure<U>(value: U): Maybe<U> {
     if (value !== undefined && value !== null) {
       return new Some(value);
     } else {

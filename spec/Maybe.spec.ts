@@ -1,20 +1,23 @@
 import { expect } from 'chai';
 
-import { Maybe, Some, None, none } from '../src/maybe';
+import { Generators } from '../src/generator';
+import { Maybe, Some, none } from '../src/maybe';
+
+const pure = Maybe.pure;
 
 describe('Maybe', () => {
 
-  describe('from', () => {
+  describe('pure', () => {
 
     it('should produce Some for a non-empty value', () => {
       let numericValue = 3;
-      let wrappedValue: Maybe<number> = Maybe.from(numericValue);
+      let wrappedValue: Maybe<number> = pure(numericValue);
 
       expect(wrappedValue).to.eql(new Some(numericValue));
     });
 
     it('should produce None for an empty value', () => {
-      let wrappedValue: Maybe<number> = Maybe.from(null);
+      let wrappedValue: Maybe<number> = pure(null);
 
       expect(wrappedValue).to.equal(none);
     });
@@ -57,5 +60,40 @@ describe('Maybe', () => {
     });
   });
 
-  //TODO: Verify monadic laws
+  describe('Monadic laws for Maybe', () => {
+
+    let values = [null, 1, 3, 5];
+
+    // flatMap(f)(pure) == f
+    it('should satisfy the left identity law', () => {
+      values.forEach(value => {
+        let f = (x: number) => pure(x == null ? null : 2 * x);
+        let leftSide = pure(value).flatMap(f);
+        let rightSide = f(value);
+        expect(pure(value).flatMap(f)).to.eql(f(value));
+      });
+    });
+
+    // m.flatMap(pure) == m
+    it('should satisfy the right identity law', () => {
+      values.forEach(value => {
+        let m = pure(value)
+        expect(m.flatMap(pure)).to.eql(m);
+      });
+    });
+
+    // m.flatMap(f).flatMap(g) == m.flatMap(flatMap(g)(f))
+    it('should satisfy the associativity law', () => {
+      values.forEach(value => {
+        let f = (x: number) => pure(x == null ? null : 2 * x);
+        let g = (x: number) => pure(x == null ? null : x * x);
+        let m = pure(value);
+
+        let leftSide = m.flatMap(f).flatMap(g);
+        let rightSide = m.flatMap(x => f(x).flatMap(g));
+  
+        expect(leftSide).to.eql(rightSide);
+      });
+    });
+  });
 });

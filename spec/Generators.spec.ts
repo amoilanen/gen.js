@@ -17,14 +17,14 @@ describe('Generators', () => {
     it('should produce single point for the range containing one point', () => {
       let generator: Generator<number> = Generators.choose(5, 5);
 
-      expect(generator.generate()).to.eql(Maybe.from(5));
+      expect(generator.generate()).to.eql(Maybe.pure(5));
     });
 
     it('should produce a random value within a range', () => {
       stub(Math, 'random').returns(0.5);
       let generator: Generator<number> = Generators.choose(0, 10);
 
-      expect(generator.generate()).to.eql(Maybe.from(5));
+      expect(generator.generate()).to.eql(Maybe.pure(5));
     });
   });
 

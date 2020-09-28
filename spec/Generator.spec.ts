@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { Generators, Generator } from '../src/generator';
+import { Generators } from '../src/generator';
 
 const pure = Generators.pure;
 
@@ -28,7 +28,10 @@ describe('Generator', () => {
 
   describe('Monadic laws for Generator', () => {
 
-    let values = [2, 3, 6, 5, 7];
+    let valuesNumber = 10;
+    let valueGenerator = Generators.choose(1, valuesNumber * valuesNumber);
+    let values = [...Array(valuesNumber).keys()]
+      .map(_ => valueGenerator.generate()).filter(x => x.isDefined).map(x => x.get())
 
     // flatMap(f)(pure) == f
     it('should satisfy the left identity law', () => {

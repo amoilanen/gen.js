@@ -38,7 +38,7 @@ export class Generators {
         if (this.max < this.min) {
           return none;
         } else {
-          return Maybe.from<number>(Math.random() * (this.max - this.min) + this.min);
+          return Maybe.pure<number>(Math.random() * (this.max - this.min) + this.min);
         }
       }
     })(min, max);
