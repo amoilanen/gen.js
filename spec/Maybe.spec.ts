@@ -68,8 +68,6 @@ describe('Maybe', () => {
     it('should satisfy the left identity law', () => {
       values.forEach(value => {
         let f = (x: number) => pure(x == null ? null : 2 * x);
-        let leftSide = pure(value).flatMap(f);
-        let rightSide = f(value);
         expect(pure(value).flatMap(f)).to.eql(f(value));
       });
     });
