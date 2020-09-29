@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { stub } from 'sinon';
 
-import { Maybe, none } from '../src/maybe';
+import { Maybe, Some, none } from '../src/maybe';
 import { Generators, Generator } from '../src';
 
 describe('Generators', () => {
@@ -34,6 +34,28 @@ describe('Generators', () => {
       let generator: Generator<number> = Generators.never();
 
       expect(generator.generate()).to.eql(none);
+    });
+  });
+
+  describe('pure', () => {
+
+    it('should produce the value given as the argument', () => {
+      let value = 5;
+
+      expect(Generators.pure(value).generate()).to.eql(new Some(value));
+    });
+  });
+
+  describe('oneOfValues', () => {
+
+    it('should generate one of the values', () => {
+      let values = [1, 2, 3];
+      let generatedValue = Generators.oneOfValues(...values).generate()
+      expect(values.includes(generatedValue.get())).to.be.true;
+    });
+
+    it('should generate none when the list of values is empty', () => {
+      expect(Generators.oneOfValues().generate()).to.eql(none);
     });
   });
 });

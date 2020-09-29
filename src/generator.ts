@@ -52,7 +52,6 @@ export class Generators {
     });
   }
 
-  //TODO: Add tests for the methods added as a result of a quick spike/prototyping
   static pure<T>(value: T): Generator<T> {
     let generatedValue = new Some(value);
     return new (class extends Generator<T> {
@@ -63,6 +62,7 @@ export class Generators {
     })();
   }
 
+  //TODO: Add tests for the methods added as a result of a quick spike/prototyping
   static oneOfValues<T>(...values: Array<T>): Generator<T> {
     let generators = values.map(value => this.pure(value));
     return this.oneOf(...generators);
