@@ -72,12 +72,16 @@ export class Generators {
     return new (class extends Generator<T> {
 
       generate() {
-        let randomIndex = Math.floor(Math.min(
-          Math.random() * generators.length,
-          generators.length - 1
-        ));
-        let randomGenerator = generators[randomIndex];
-        return randomGenerator.generate();
+        let generated = none;
+        if (generators.length > 0) {
+          let randomIndex = Math.floor(Math.min(
+            Math.random() * generators.length,
+            generators.length - 1
+          ));
+          let randomGenerator = generators[randomIndex];
+          generated = randomGenerator.generate();
+        }
+        return generated;
       }
     })();
   }
