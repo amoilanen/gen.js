@@ -50,12 +50,27 @@ describe('Generators', () => {
 
     it('should generate one of the values', () => {
       let values = [1, 2, 3];
-      let generatedValue = Generators.oneOfValues(...values).generate()
+      let generatedValue = Generators.oneOfValues(...values).generate();
       expect(values.includes(generatedValue.get())).to.be.true;
     });
 
     it('should generate none when the list of values is empty', () => {
       expect(Generators.oneOfValues().generate()).to.eql(none);
+    });
+  });
+
+  describe('oneOf', () => {
+
+    it('should generate one of the values', () => {
+      let first = Generators.choose(0, 10);
+      let second = Generators.choose(10, 20);
+      let third = Generators.choose(20, 30);
+      let generatedValue = Generators.oneOf(first, second, third).generate().get();
+      expect(generatedValue).within(0, 30);
+    });
+
+    it('should generate none when the list of values is empty', () => {
+      expect(Generators.oneOf().generate()).to.eql(none);
     });
   });
 });
