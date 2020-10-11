@@ -25,7 +25,28 @@ export abstract class Generator<T> {
 
 type G<T> = Generator<T>
 
+const capitalLettersASCIIStart = 65;
+const capitalLettersASCIIEnd = 90;
+
+const lettersASCIIStart = 97;
+const lettersASCIIEnd = 122;
+
 export class Generators {
+
+
+  static alphaChar(): Generator<string> {
+    return this.oneOf(this.alphaLowerChar(), this.alphaUpperChar());
+  }
+
+  static alphaLowerChar(): Generator<string> {
+    return this.choose(lettersASCIIStart, lettersASCIIEnd)
+      .map(charCode => String.fromCharCode(charCode))
+  }
+
+  static alphaUpperChar(): Generator<string> {
+    return this.choose(capitalLettersASCIIStart, capitalLettersASCIIEnd)
+      .map(charCode => String.fromCharCode(charCode))
+  }
 
   static choose(min: number, max: number): Generator<number> {
     return new (class extends Generator<number> {
