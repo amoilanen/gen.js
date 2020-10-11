@@ -128,6 +128,8 @@ describe('Generators', () => {
   desribeCharGenerator('alphaLowerChar', Generators.alphaLowerChar(), /[a-z]/);
   desribeCharGenerator('alphaUpperChar', Generators.alphaUpperChar(), /[A-Z]/);
   desribeCharGenerator('alphaChar', Generators.alphaChar(), /[a-zA-Z]/);
+  desribeCharGenerator('numChar', Generators.numChar(), /[0-9]/);
+  desribeCharGenerator('alphaNumChar', Generators.alphaNumChar(), /[0-9a-zA-Z]/);
 
   function desribeCharGenerator(generatorName: string, generator: Generator<string>, expectedRegex: RegExp) {
     describe(generatorName, () => {

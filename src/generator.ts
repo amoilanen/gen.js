@@ -31,21 +31,34 @@ const capitalLettersASCIIEnd = 90;
 const lettersASCIIStart = 97;
 const lettersASCIIEnd = 122;
 
+const digitsASCIIStart = 48;
+const digitsASCIIEnd = 49;
+
 export class Generators {
 
+  static asciiRange(from: number, to: number): Generator<string> {
+    return this.choose(from, to)
+      .map(charCode => String.fromCharCode(charCode))
+  }
 
   static alphaChar(): Generator<string> {
     return this.oneOf(this.alphaLowerChar(), this.alphaUpperChar());
   }
 
   static alphaLowerChar(): Generator<string> {
-    return this.choose(lettersASCIIStart, lettersASCIIEnd)
-      .map(charCode => String.fromCharCode(charCode))
+    return this.asciiRange(lettersASCIIStart, lettersASCIIEnd);
   }
 
   static alphaUpperChar(): Generator<string> {
-    return this.choose(capitalLettersASCIIStart, capitalLettersASCIIEnd)
-      .map(charCode => String.fromCharCode(charCode))
+    return this.asciiRange(capitalLettersASCIIStart, capitalLettersASCIIEnd);
+  }
+
+  static numChar(): Generator<string> {
+    return this.asciiRange(digitsASCIIStart, digitsASCIIEnd);
+  }
+
+  static alphaNumChar(): Generator<string> {
+    return this.oneOf(this.alphaChar(), this.numChar());
   }
 
   static choose(min: number, max: number): Generator<number> {
