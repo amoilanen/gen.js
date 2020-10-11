@@ -124,4 +124,28 @@ describe('Generators', () => {
       expect(Generators.nTuple(empty, empty, empty).generate()).to.eql(none);
     });
   });
+
+  desribeCharGenerator('alphaLowerChar', Generators.alphaLowerChar(), /[a-z]/);
+  desribeCharGenerator('alphaUpperChar', Generators.alphaUpperChar(), /[A-Z]/);
+  desribeCharGenerator('alphaChar', Generators.alphaChar(), /[a-zA-Z]/);
+
+  function desribeCharGenerator(generatorName: string, generator: Generator<string>, expectedRegex: RegExp) {
+    describe(generatorName, () => {
+      const triesNumber = 10;
+
+      const generatedCharacters = [...Array(triesNumber).keys()].map(_ =>
+        generator.generate()
+      );
+  
+      it(`should generate characters in the range ${expectedRegex}`, () => {
+        expect(generatedCharacters.every(char => char.isDefined)).to.be.true;
+        expect(generatedCharacters.every(char => expectedRegex.test(char.get()))).to.be.true;
+      });
+  
+      it('should generate different characters', () => {
+        const uniqueGeneratedCharacters = new Set(generatedCharacters);
+        expect(uniqueGeneratedCharacters.size).to.be.above(1);
+      });
+    });
+  }
 });
