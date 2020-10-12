@@ -25,14 +25,18 @@ export abstract class Generator<T> {
 
 type G<T> = Generator<T>
 
-const capitalLettersASCIIStart = 65;
-const capitalLettersASCIIEnd = 90;
+function asciiCode(char: string): number {
+  return char.codePointAt(0);
+}
 
-const lettersASCIIStart = 97;
-const lettersASCIIEnd = 122;
+const capitalLettersASCIIStart = asciiCode('A');
+const capitalLettersASCIIEnd = asciiCode('Z');
 
-const digitsASCIIStart = 48;
-const digitsASCIIEnd = 49;
+const lettersASCIIStart = asciiCode('a');
+const lettersASCIIEnd = asciiCode('z');
+
+const digitsASCIIStart = asciiCode('0');
+const digitsASCIIEnd = asciiCode('9');
 
 export class Generators {
 
@@ -59,6 +63,26 @@ export class Generators {
 
   static alphaNumChar(): Generator<string> {
     return this.oneOf(this.alphaChar(), this.numChar());
+  }
+
+  //TODO: Implement and test
+  static times<T>(timesNumber: number, generator: Generator<T>): Generator<Array<T>> {
+    return null;
+  }
+
+  static hexChar(): Generator<string> {
+    return this.oneOf(
+      this.numChar(),
+      this.asciiRange(
+        asciiCode('A'),
+        asciiCode('F')
+      )
+    );
+  }
+
+  //TODO: Implement and test as a combination of times and hexChar
+  static uuid(): Generator<string> {
+    return null;
   }
 
   static choose(min: number, max: number): Generator<number> {

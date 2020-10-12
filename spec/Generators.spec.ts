@@ -125,11 +125,13 @@ describe('Generators', () => {
     });
   });
 
+  desribeCharGenerator('asciiRange', Generators.asciiRange(40, 41), /[\(\)]/);
   desribeCharGenerator('alphaLowerChar', Generators.alphaLowerChar(), /[a-z]/);
   desribeCharGenerator('alphaUpperChar', Generators.alphaUpperChar(), /[A-Z]/);
   desribeCharGenerator('alphaChar', Generators.alphaChar(), /[a-zA-Z]/);
   desribeCharGenerator('numChar', Generators.numChar(), /[0-9]/);
   desribeCharGenerator('alphaNumChar', Generators.alphaNumChar(), /[0-9a-zA-Z]/);
+  desribeCharGenerator('hexChar', Generators.hexChar(), /[0-9A-F]/);
 
   function desribeCharGenerator(generatorName: string, generator: Generator<string>, expectedRegex: RegExp) {
     describe(generatorName, () => {
