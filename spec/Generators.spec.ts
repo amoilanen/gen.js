@@ -133,11 +133,44 @@ describe('Generators', () => {
   desribeCharGenerator('alphaNumChar', Generators.alphaNumChar(), /[0-9a-zA-Z]/);
   desribeCharGenerator('hexChar', Generators.hexChar(), /[0-9A-F]/);
 
+  describe('times', () => {
+
+    const value = 'a';
+
+    it('should generate array of the requested length', () => {
+      const elementsNumber = 5;
+      const generator = Generators.times(elementsNumber, Generators.pure(value));
+
+      const expected = [...new Array(elementsNumber)].map(_ => value);
+      expect(generator.generate().get()).to.eql(expected);
+    });
+
+    it('should be able to generate array of length 1', () => {
+      const triesNumber = 10;
+      const generator = Generators.pure(value);
+      const timesGenerator = Generators.times(1, generator);
+      const arrayGenerator = generator.map(value => [ value ]);
+      [...Array(triesNumber)].forEach(_ => {
+        expect(timesGenerator.generate()).to.eql(arrayGenerator.generate());
+      });
+    });
+
+    it('should always generate an empty Array if timesNumber is 0', () => {
+      const generator = Generators.times(0, Generators.never());
+      expect(generator.generate().get()).to.eql([]);
+    });
+
+    it('should always generate an empty Array if timesNumber is negative', () => {
+      const generator = Generators.times(-3, Generators.never());
+      expect(generator.generate().get()).to.eql([]);
+    });
+  });
+
   function desribeCharGenerator(generatorName: string, generator: Generator<string>, expectedRegex: RegExp) {
     describe(generatorName, () => {
       const triesNumber = 10;
 
-      const generatedCharacters = [...Array(triesNumber).keys()].map(_ =>
+      const generatedCharacters = [...Array(triesNumber)].map(_ =>
         generator.generate()
       );
   

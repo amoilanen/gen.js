@@ -65,9 +65,19 @@ export class Generators {
     return this.oneOf(this.alphaChar(), this.numChar());
   }
 
-  //TODO: Implement and test
   static times<T>(timesNumber: number, generator: Generator<T>): Generator<Array<T>> {
-    return null;
+    timesNumber = Math.max(timesNumber, 0);
+    return new (class extends Generator<Array<T>> {
+
+      generate() {
+        const generatedValues = [...Array(timesNumber)].map(_ => generator.generate());
+        const definedGeneratedValues = generatedValues
+          .filter(value => value.isDefined)
+          .map(value => value.get());
+        return (definedGeneratedValues.length < timesNumber) ?
+          none : new Some(definedGeneratedValues);
+      }
+    });
   }
 
   static hexChar(): Generator<string> {
