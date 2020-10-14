@@ -125,14 +125,6 @@ describe('Generators', () => {
     });
   });
 
-  desribeCharGenerator('asciiRange', Generators.asciiRange(40, 41), /[\(\)]/);
-  desribeCharGenerator('alphaLowerChar', Generators.alphaLowerChar(), /[a-z]/);
-  desribeCharGenerator('alphaUpperChar', Generators.alphaUpperChar(), /[A-Z]/);
-  desribeCharGenerator('alphaChar', Generators.alphaChar(), /[a-zA-Z]/);
-  desribeCharGenerator('numChar', Generators.numChar(), /[0-9]/);
-  desribeCharGenerator('alphaNumChar', Generators.alphaNumChar(), /[0-9a-zA-Z]/);
-  desribeCharGenerator('hexChar', Generators.hexChar(), /[0-9A-F]/);
-
   describe('times', () => {
 
     const value = 'a';
@@ -166,7 +158,16 @@ describe('Generators', () => {
     });
   });
 
-  function desribeCharGenerator(generatorName: string, generator: Generator<string>, expectedRegex: RegExp) {
+  describeStringGenerator('asciiRange', Generators.asciiRange(40, 41), /[\(\)]/);
+  describeStringGenerator('alphaLowerChar', Generators.alphaLowerChar(), /[a-z]/);
+  describeStringGenerator('alphaUpperChar', Generators.alphaUpperChar(), /[A-Z]/);
+  describeStringGenerator('alphaChar', Generators.alphaChar(), /[a-zA-Z]/);
+  describeStringGenerator('numChar', Generators.numChar(), /[0-9]/);
+  describeStringGenerator('alphaNumChar', Generators.alphaNumChar(), /[0-9a-zA-Z]/);
+  describeStringGenerator('hexChar', Generators.hexChar(), /[0-9A-F]/);
+  describeStringGenerator('uuid', Generators.uuid(), /[0-9A-F]{8}\-[0-9A-F]{4}\-4[0-9A-F]{3}\-[89AB][0-9A-F]{3}\-[0-9A-F]{12}/); // RFC 4122 compliant UUID
+
+  function describeStringGenerator(generatorName: string, generator: Generator<string>, expectedRegex: RegExp) {
     describe(generatorName, () => {
       const triesNumber = 10;
 
