@@ -67,17 +67,8 @@ export class Generators {
 
   static times<T>(timesNumber: number, generator: Generator<T>): Generator<Array<T>> {
     timesNumber = Math.max(timesNumber, 0);
-    return new (class extends Generator<Array<T>> {
-
-      generate() {
-        const generatedValues = [...Array(timesNumber)].map(_ => generator.generate());
-        const definedGeneratedValues = generatedValues
-          .filter(value => value.isDefined)
-          .map(value => value.get());
-        return (definedGeneratedValues.length < timesNumber) ?
-          none : new Some(definedGeneratedValues);
-      }
-    });
+    const generators = [...Array(timesNumber)].map(_ => generator);
+    return this.nTuple(...generators);
   }
 
   static hexChar(): Generator<string> {
@@ -90,21 +81,31 @@ export class Generators {
     );
   }
 
+  static concat(times: number, stringGenerator: Generator<string>): Generator<string> {
+    return this.times(times, stringGenerator).map(_ => _.join(''));
+  }
+
+  static alphaNumString(length: number): Generator<string> {
+    return this.concat(length, this.alphaNumChar());
+  }
+
+  static hexCharString(length: number): Generator<string> {
+    return this.concat(length, this.hexChar());
+  }
+
   /*
    * Generate RFC 4122 compliant UUID
    */
   static uuid(): Generator<string> {
     const uuidVersion = 4;
     const variant = this.oneOfValues('8', '9', 'A', 'B');
-    const hexCharString = (length: number) =>
-      this.times(length, this.hexChar()).map(_ => _.join(''));
 
     const blocks: Array<Generator<string>> = [
-      hexCharString(8),
-      hexCharString(4),
-      hexCharString(3).map(_ => `${uuidVersion}${_}`),
-      hexCharString(3).flatMap(_ => variant.map(v => `${v}${_}`)),
-      hexCharString(12)
+      this.hexCharString(8),
+      this.hexCharString(4),
+      this.hexCharString(3).map(_ => `${uuidVersion}${_}`),
+      this.hexCharString(3).flatMap(_ => variant.map(v => `${v}${_}`)),
+      this.hexCharString(12)
     ];
     return this.nTuple(...blocks).map(_ => _.join('-'));
   }
@@ -176,6 +177,7 @@ export class Generators {
   static nTuple<T1, T2, T3, T4, T5, T6, T7, T8>(g1: G<T1>, g2: G<T2>, g3: G<T3>, g4: G<T4>, g5: G<T5>, g6: G<T6>, g7: G<T7>, g8: G<T8>): G<[T1, T2, T3, T4, T5, T6, T7, T8]>
   static nTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>(g1: G<T1>, g2: G<T2>, g3: G<T3>, g4: G<T4>, g5: G<T5>, g6: G<T6>, g7: G<T7>, g8: G<T8>, g9: G<T9>): G<[T1, T2, T3, T4, T5, T6, T7, T8, T9]>
   static nTuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(g1: G<T1>, g2: G<T2>, g3: G<T3>, g4: G<T4>, g5: G<T5>, g6: G<T6>, g7: G<T7>, g8: G<T8>, g9: G<T9>, g10: G<T10>): G<[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]>
+  //TODO: Add tests for this variant
   static nTuple<T>(...generators: Array<Generator<T>>): Generator<[T]>
 
   static nTuple(...generators: Array<Generator<any>>): Generator<any> {
