@@ -81,16 +81,20 @@ export class Generators {
     );
   }
 
-  static concat(times: number, stringGenerator: Generator<string>): Generator<string> {
+  static concat(...generators: Array<Generator<string>>): Generator<string> {
+    return this.nTuple(...generators).map(values => values.join(''));
+  }
+
+  static repeat(times: number, stringGenerator: Generator<string>): Generator<string> {
     return this.times(times, stringGenerator).map(_ => _.join(''));
   }
 
   static alphaNumString(length: number): Generator<string> {
-    return this.concat(length, this.alphaNumChar());
+    return this.repeat(length, this.alphaNumChar());
   }
 
   static hexCharString(length: number): Generator<string> {
-    return this.concat(length, this.hexChar());
+    return this.repeat(length, this.hexChar());
   }
 
   /*
@@ -150,6 +154,11 @@ export class Generators {
     return this.oneOf(...generators);
   }
 
+  static sequenceOfValues<T>(...values: Array<T>): Generator<T> {
+    let generators = values.map(value => this.pure(value));
+    return this.oneOf(...generators);
+  }
+
   static oneOf<T>(...generators: Array<Generator<T>>): Generator<T> {
     return new (class extends Generator<T> {
 
@@ -164,6 +173,17 @@ export class Generators {
           generated = randomGenerator.generate();
         }
         return generated;
+      }
+    })();
+  }
+
+  static sequenceOf<T>(...values: Array<Generator<T>>): Generator<T> {
+    return new (class extends Generator<T> {
+      idx: number = -1;
+
+      generate() {
+        this.idx = (this.idx + 1) % values.length;
+        return values[this.idx].generate();
       }
     })();
   }
