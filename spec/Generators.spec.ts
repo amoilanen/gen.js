@@ -205,21 +205,39 @@ describe('Generators', () => {
   describe('sequenceOfValues', () => {
 
     it('should generate the given values in sequence', () => {
+      const values = [0, 1, 2];
+      const generator = Generators.sequenceOfValues(...values);
+      const numberOfSequences = 3;
+      const times = values.length * numberOfSequences;
 
+      const expected = [].concat.apply([], [...Array(numberOfSequences)].map(_ => values));
+      const generated = [...Array(times)].map(_ =>
+        generator.generate().get()
+      );
+      expect(generated).to.eql(expected);
     });
 
     it('should generate only single value if a single value is given', () => {
+      const value = 3;
+      const times = 5;
+      const expected = [...Array(times)].map(_ => value);
+      const generator = Generators.sequenceOfValues(value);
 
+      const generated = [...Array(times)].map(_ =>
+        generator.generate().get()
+      );
+      expect(generated).to.eql(expected);
     });
 
 
     it('should generate none if no values are given', () => {
-
+      expect(Generators.sequenceOfValues().generate()).to.eql(none);
     });
   });
 
   describe('sequenceOf', () => {
 
+    //TODO: Should generate none in a sequence if some generator generates none
   });
 
   //TODO: alphaNumString

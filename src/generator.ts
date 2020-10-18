@@ -156,7 +156,7 @@ export class Generators {
 
   static sequenceOfValues<T>(...values: Array<T>): Generator<T> {
     let generators = values.map(value => this.pure(value));
-    return this.oneOf(...generators);
+    return this.sequenceOf(...generators);
   }
 
   static oneOf<T>(...generators: Array<Generator<T>>): Generator<T> {
@@ -182,8 +182,12 @@ export class Generators {
       idx: number = -1;
 
       generate() {
-        this.idx = (this.idx + 1) % values.length;
-        return values[this.idx].generate();
+        if (values.length > 0) {
+          this.idx = (this.idx + 1) % values.length;
+          return values[this.idx].generate();
+        } else {
+          return none;
+        }
       }
     })();
   }
