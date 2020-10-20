@@ -1,11 +1,20 @@
 import { expect } from 'chai';
-import { stub } from 'sinon';
+import { SinonSandbox, createSandbox} from 'sinon';
 
 import { Maybe, Some, none } from '../src/maybe';
 import { Generators, Generator } from '../src';
-import { generateKeyPair } from 'crypto';
 
 describe('Generators', () => {
+
+  let sandbox: SinonSandbox;
+
+  beforeEach(() => {
+    sandbox = createSandbox();
+  });
+
+  afterEach(() => {
+    sandbox.restore();
+  });
 
   describe('choose', () => {
 
@@ -22,7 +31,7 @@ describe('Generators', () => {
     });
 
     it('should produce a random value within a range', () => {
-      stub(Math, 'random').returns(0.5);
+      sandbox.stub(Math, 'random').returns(0.5);
       let generator: Generator<number> = Generators.choose(0, 10);
 
       expect(generator.generate()).to.eql(Maybe.pure(5));
@@ -257,6 +266,30 @@ describe('Generators', () => {
       const generator = Generators.sequenceOf();
       expect(generator.generate()).to.eql(none);
     });
+  });
+
+  describe('frequency', () => {
+
+    it('should choose one of two generators based on frequency', () => {
+      const firstValueFrequency = 0.1
+      const firstValue = 1
+      const secondValueFrequency = 0.9
+      const secondValue = 2
+      const smallDelta = Math.min(firstValueFrequency, secondValueFrequency) / 2;
+      const generator = Generators.frequency([0.1, Generators.pure(1)], [0.9, Generators.pure(2)]);
+
+      const stub = sandbox.stub(Math, 'random');
+      stub.returns(firstValueFrequency - smallDelta);
+      expect(generator.generate().get()).to.eql(firstValue);
+      stub.returns(firstValueFrequency + smallDelta);
+      expect(generator.generate().get()).to.eql(secondValue);
+    });
+
+    //TODO: Should support frequencies which do not add up to one
+    //TODO: Should support multiple provided generators
+    //TODO: Only one generator provided
+    //TODO: No generators provided
+    //TODO: Negative frequencies are interpreted as zero
   });
 
   describe('alphaNumString', () => {

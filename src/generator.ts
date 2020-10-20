@@ -192,6 +192,37 @@ export class Generators {
     })();
   }
 
+  static frequency<T>(...generatorFrequences: Array<[number, Generator<T>]>): Generator<T> {
+    const frequencies = generatorFrequences.map(_ => _[0]);
+    const totalFrequency = frequencies.reduce((x, y) => x + y);
+    const probabilities = frequencies.map(_ => _ / totalFrequency);
+    const generators = generatorFrequences.map(_ => _[1]);
+
+    return new (class extends Generator<T> {
+
+      generate() {
+        const randomValue = Math.random();
+        let generatorIdx = 0;
+        let foundGeneratorToUse = false;
+        let accumulatedProbability = 0;
+        while (!foundGeneratorToUse && (generatorIdx < generators.length)) {
+          accumulatedProbability += probabilities[generatorIdx];
+          generatorIdx += 1;
+          if (accumulatedProbability >= randomValue) {
+            foundGeneratorToUse = true;
+          }
+        }
+        generatorIdx = generatorIdx - 1;
+        if (generatorIdx >= 0) {
+          const randomGenerator = generators[generatorIdx];
+          return randomGenerator.generate();
+        } else {
+          return none;
+        }
+      }
+    })();
+  }
+
   static nTuple<T1, T2>(g1: G<T1>, g2: G<T2>): G<[T1, T2]>
   static nTuple<T1, T2, T3>(g1: G<T1>, g2: G<T2>, g3: G<T3>): G<[T1, T2, T3]>
   static nTuple<T1, T2, T3, T4>(g1: G<T1>, g2: G<T2>, g3: G<T3>, g4: G<T4>): G<[T1, T2, T3, T4]>
