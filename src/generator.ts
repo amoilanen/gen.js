@@ -93,7 +93,7 @@ export class Generators {
     return this.repeat(length, this.alphaNumChar());
   }
 
-  static hexCharString(length: number): Generator<string> {
+  static hexString(length: number): Generator<string> {
     return this.repeat(length, this.hexChar());
   }
 
@@ -105,11 +105,11 @@ export class Generators {
     const variant = this.oneOfValues('8', '9', 'A', 'B');
 
     const blocks: Array<Generator<string>> = [
-      this.hexCharString(8),
-      this.hexCharString(4),
-      this.hexCharString(3).map(_ => `${uuidVersion}${_}`),
-      this.hexCharString(3).flatMap(_ => variant.map(v => `${v}${_}`)),
-      this.hexCharString(12)
+      this.hexString(8),
+      this.hexString(4),
+      this.hexString(3).map(_ => `${uuidVersion}${_}`),
+      this.hexString(3).flatMap(_ => variant.map(v => `${v}${_}`)),
+      this.hexString(12)
     ];
     return this.nTuple(...blocks).map(_ => _.join('-'));
   }
