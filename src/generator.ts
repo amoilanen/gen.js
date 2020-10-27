@@ -193,34 +193,39 @@ export class Generators {
   }
 
   static frequency<T>(...generatorFrequences: Array<[number, Generator<T>]>): Generator<T> {
-    const frequencies = generatorFrequences.map(_ => _[0]);
-    const totalFrequency = frequencies.reduce((x, y) => x + y);
-    const probabilities = frequencies.map(_ => _ / totalFrequency);
-    const generators = generatorFrequences.map(_ => _[1]);
-
-    return new (class extends Generator<T> {
-
-      generate() {
-        const randomValue = Math.random();
-        let generatorIdx = 0;
-        let foundGeneratorToUse = false;
-        let accumulatedProbability = 0;
-        while (!foundGeneratorToUse && (generatorIdx < generators.length)) {
-          accumulatedProbability += probabilities[generatorIdx];
-          generatorIdx += 1;
-          if (accumulatedProbability >= randomValue) {
-            foundGeneratorToUse = true;
+    generatorFrequences = generatorFrequences.filter(frequency => frequency[0] > 0);
+    if (generatorFrequences.length > 0) {
+      const frequencies = generatorFrequences.map(_ => _[0]);
+      const totalFrequency = frequencies.reduce((x, y) => x + y);
+      const probabilities = frequencies.map(_ => _ / totalFrequency);
+      const generators = generatorFrequences.map(_ => _[1]);
+  
+      return new (class extends Generator<T> {
+  
+        generate() {
+          const randomValue = Math.random();
+          let generatorIdx = 0;
+          let foundGeneratorToUse = false;
+          let accumulatedProbability = 0;
+          while (!foundGeneratorToUse && (generatorIdx < generators.length)) {
+            accumulatedProbability += probabilities[generatorIdx];
+            generatorIdx += 1;
+            if (accumulatedProbability >= randomValue) {
+              foundGeneratorToUse = true;
+            }
+          }
+          generatorIdx = generatorIdx - 1;
+          if (generatorIdx >= 0) {
+            const randomGenerator = generators[generatorIdx];
+            return randomGenerator.generate();
+          } else {
+            return none;
           }
         }
-        generatorIdx = generatorIdx - 1;
-        if (generatorIdx >= 0) {
-          const randomGenerator = generators[generatorIdx];
-          return randomGenerator.generate();
-        } else {
-          return none;
-        }
-      }
-    })();
+      })();
+    } else {
+      return Generators.never();
+    }
   }
 
   static nTuple<T1, T2>(g1: G<T1>, g2: G<T2>): G<[T1, T2]>

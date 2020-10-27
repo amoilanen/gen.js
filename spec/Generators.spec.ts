@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { SinonSandbox, createSandbox} from 'sinon';
+import { SinonSandbox, createSandbox, stub} from 'sinon';
 
 import { Maybe, Some, none } from '../src/maybe';
 import { Generators, Generator } from '../src';
@@ -270,7 +270,7 @@ describe('Generators', () => {
 
   describe('frequency', () => {
 
-    it('should choose one of two generators based on frequency', () => {
+    it('should choose one of two generators based on frequency which is different', () => {
       const firstValueFrequency = 0.1
       const firstValue = 1
       const secondValueFrequency = 0.9
@@ -285,11 +285,45 @@ describe('Generators', () => {
       expect(generator.generate().get()).to.eql(secondValue);
     });
 
-    //TODO: Should support frequencies which do not add up to one
-    //TODO: Should support multiple provided generators
-    //TODO: Only one generator provided
-    //TODO: No generators provided
-    //TODO: Negative frequencies are interpreted as zero
+    it('should support multiple generators and frequencies which do not add up to one', () => {
+      const generatorsNumber = 5;
+      const generatorFrequency = 3;
+      const generators: Array<[number, Generator<number>]> = [...Array(generatorsNumber).keys()].map(idx =>
+        [generatorFrequency, Generators.pure(idx)]
+      );
+
+      const generator = Generators.frequency(...generators);
+      const lastGeneratorProbability = 1 - (1 / (generatorsNumber + 1));
+      sandbox.stub(Math, 'random').returns(lastGeneratorProbability);
+      expect(generator.generate().get()).to.eql(generatorsNumber - 1);
+    });
+
+    it('should result in the provided generator if only one is given', () => {
+      const value = 5;
+      expect(Generators.frequency([1, Generators.pure(value)]).generate().get()).to.eql(value);
+    });
+
+    it('should generate none if no generators are provided', () => {
+      expect(Generators.frequency().generate()).to.eql(none);
+    });
+
+
+    it('should generate none if all generator frequencies are zero', () => {
+      const generatorsNumber = 3;
+      const generators: Array<[number, Generator<number>]> = [...Array(generatorsNumber).keys()].map(idx =>
+        [0, Generators.pure(idx)]
+      );
+
+      const generator = Generators.frequency(...generators);
+      sandbox.stub(Math, 'random').returns(0.5);
+      expect(generator.generate()).to.eql(none);
+    });
+
+    it('should interpret negative frequencies as zero', () => {
+      const generator = Generators.frequency([0, Generators.pure(1)], [0.2, Generators.pure(2)]);
+
+      expect(generator.generate().get()).to.eql(2);
+    });
   });
 
   describe('alphaNumString', () => {
