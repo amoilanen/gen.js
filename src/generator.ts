@@ -97,6 +97,11 @@ export class Generators {
     return this.repeat(length, this.hexChar());
   }
 
+  static identifier(maxLength: number): Generator<string> {
+    //TODO: Implement
+    return null;
+  }
+
   /*
    * Generate RFC 4122 compliant UUID
    */
@@ -192,7 +197,30 @@ export class Generators {
     })();
   }
 
+  static nonEmptyArray<T>(generator: Generator<T>, maxSize: number): Generator<Array<T>> {
+    //TODO: Implement
+    return null;
+  }
+
+  static arrayOfLength<T>(generator: Generator<T>, length: number): Generator<Array<T>> {
+    //TODO: Implement
+    return null;
+  }
+
+  static arrayOf<T>(generator: Generator<T>, maxLength: number): Generator<Array<T>> {
+    //TODO: Implement
+    return null;
+  }
+
+  //TODO: Add test
+  static frequencyOfValues<T>(...valueFrequencies: Array<[number, T]>): Generator<T> {
+    const generators: Array<[number, Generator<T>]> = valueFrequencies.map(([frequency, value]) =>
+      [frequency, Generators.pure(value)]);
+    return this.frequency(...generators);
+  }
+
   static frequency<T>(...generatorFrequences: Array<[number, Generator<T>]>): Generator<T> {
+    //TODO: Re-factor?
     generatorFrequences = generatorFrequences.filter(frequency => frequency[0] > 0);
     if (generatorFrequences.length > 0) {
       const frequencies = generatorFrequences.map(_ => _[0]);
