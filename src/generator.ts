@@ -212,40 +212,45 @@ export class Generators {
     return null;
   }
 
-  //TODO: Add test
   static frequencyOfValues<T>(...valueFrequencies: Array<[number, T]>): Generator<T> {
     const generators: Array<[number, Generator<T>]> = valueFrequencies.map(([frequency, value]) =>
       [frequency, Generators.pure(value)]);
     return this.frequency(...generators);
   }
 
+  private static frequenciesToProbabilities(frequencies: Array<number>): Array<number> {
+    const totalFrequency = frequencies.reduce((x, y) => x + y);
+    return frequencies.map(_ => _ / totalFrequency);
+  }
+
+  private static randomIndexWithProbabilityDistribution(probabilities: Array<number>): number {
+    const randomValue = Math.random();
+    let currentIndex = 0;
+    let hasFoundIndex = false;
+    let accumulatedProbability = 0;
+    while (!hasFoundIndex && (currentIndex < probabilities.length)) {
+      accumulatedProbability += probabilities[currentIndex];
+      currentIndex += 1;
+      if (accumulatedProbability >= randomValue) {
+        hasFoundIndex = true;
+      }
+    }
+    return currentIndex - 1;
+  }
+
   static frequency<T>(...generatorFrequences: Array<[number, Generator<T>]>): Generator<T> {
-    //TODO: Re-factor?
     generatorFrequences = generatorFrequences.filter(frequency => frequency[0] > 0);
     if (generatorFrequences.length > 0) {
-      const frequencies = generatorFrequences.map(_ => _[0]);
-      const totalFrequency = frequencies.reduce((x, y) => x + y);
-      const probabilities = frequencies.map(_ => _ / totalFrequency);
-      const generators = generatorFrequences.map(_ => _[1]);
-  
+      const frequencies = generatorFrequences.map(([frequency, _]) => frequency);
+      const generators = generatorFrequences.map(([_, generator]) => generator);
+      const probabilities = Generators.frequenciesToProbabilities(frequencies);
+
       return new (class extends Generator<T> {
-  
+
         generate() {
-          const randomValue = Math.random();
-          let generatorIdx = 0;
-          let foundGeneratorToUse = false;
-          let accumulatedProbability = 0;
-          while (!foundGeneratorToUse && (generatorIdx < generators.length)) {
-            accumulatedProbability += probabilities[generatorIdx];
-            generatorIdx += 1;
-            if (accumulatedProbability >= randomValue) {
-              foundGeneratorToUse = true;
-            }
-          }
-          generatorIdx = generatorIdx - 1;
+          let generatorIdx = Generators.randomIndexWithProbabilityDistribution(probabilities);
           if (generatorIdx >= 0) {
-            const randomGenerator = generators[generatorIdx];
-            return randomGenerator.generate();
+            return generators[generatorIdx].generate();
           } else {
             return none;
           }

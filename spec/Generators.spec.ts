@@ -276,7 +276,7 @@ describe('Generators', () => {
       const secondValueFrequency = 0.9
       const secondValue = 2
       const smallDelta = Math.min(firstValueFrequency, secondValueFrequency) / 2;
-      const generator = Generators.frequency([0.1, Generators.pure(1)], [0.9, Generators.pure(2)]);
+      const generator = Generators.frequency([firstValueFrequency, Generators.pure(1)], [secondValueFrequency, Generators.pure(2)]);
 
       const stub = sandbox.stub(Math, 'random');
       stub.returns(firstValueFrequency - smallDelta);
@@ -322,6 +322,15 @@ describe('Generators', () => {
     it('should interpret negative frequencies as zero', () => {
       const generator = Generators.frequency([0, Generators.pure(1)], [0.2, Generators.pure(2)]);
 
+      expect(generator.generate().get()).to.eql(2);
+    });
+  });
+
+  describe('frequencyOfValues', () => {
+
+    it('should generate given values with the provided frequencies', () => {
+      const generator = Generators.frequencyOfValues([0.3, 1], [0.3, 2], [0.4, 3]);
+      sandbox.stub(Math, 'random').returns(0.5);
       expect(generator.generate().get()).to.eql(2);
     });
   });
