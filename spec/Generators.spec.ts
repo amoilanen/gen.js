@@ -335,6 +335,44 @@ describe('Generators', () => {
     });
   });
 
+  describe('arrayOfLength', () => {
+
+    it('should generate array of given length if generator generates values', () => {
+      const value = 'abc';
+      const length = 5;
+      const generator = Generators.arrayOfLength(Generators.pure(value), length);
+      const expected = [...Array(length)].map(_ => value);
+      expect(generator.generate().get()).to.eql(expected);
+    });
+
+    it('should generate none if given generator generates none at least once', () => {
+      const value = 3;
+      const frequencyGenerator = Generators.frequency([0.1, Generators.pure(value)], [0.9, Generators.never()]);
+      const random = sandbox.stub(Math, 'random')
+      random.onCall(0).returns(0.05);
+      random.onCall(1).returns(0.06);
+      random.onCall(2).returns(0.15);
+      const generator = Generators.arrayOfLength(frequencyGenerator, 3);
+      expect(generator.generate()).to.eql(none);
+    });
+
+    it('should generate empty array if length is zero', () => {
+      let notNoneZeroTimes = Generators.arrayOfLength(Generators.pure(3), 0);
+      let noneZeroTimes = Generators.arrayOfLength(Generators.never(), 0);
+
+      expect(notNoneZeroTimes.generate().get()).to.eql([]);
+      expect(noneZeroTimes.generate().get()).to.eql([]);
+    });
+
+    it('should generate none if the length is negative', () => {
+      let generator = Generators.arrayOfLength(Generators.pure(3), -5);
+
+      expect(generator.generate()).to.eql(none);
+    });
+
+    //TODO: Negative length - none
+  });
+
   describe('alphaNumString', () => {
     describeStringGenerator('alphaNumString - fixed length', Generators.alphaNumString(3), /[a-zA-Z0-9]{3}/);
     describeStringGenerator('alphaNumString - one symbol', Generators.alphaNumString(1), /[a-zA-Z0-9]/);
