@@ -198,23 +198,17 @@ export class Generators {
   }
 
   static nonEmptyArray<T>(generator: Generator<T>, maxSize: number): Generator<Array<T>> {
-    //TODO: Implement
-    return null;
+    //TODO: Test
+    let suffixGenerator = Generators.arrayOfLength(generator, maxSize - 1);
+    return this.nTuple(generator, suffixGenerator).map(([first, suffix]) =>
+      [ first ].concat(suffix)
+    );
   }
 
   static arrayOfLength<T>(generator: Generator<T>, length: number): Generator<Array<T>> {
-    return (length >= 0) ?
-      new (class extends Generator<Array<T>> {
-
-        generate(): Maybe<Array<T>> {
-          let generatedValues = [...Array(length)]
-            .map(_ => generator.generate())
-            .filter(value => value.isDefined)
-            .map(value => value.get());
-    
-          return generatedValues.length == length ? new Some(generatedValues) : none;
-        }
-      })() : Generators.never();
+    return (length < 0) ?
+      Generators.never()
+      : this.nTuple(...[...Array(length)].map( _ => generator));
   }
 
   static arrayOf<T>(generator: Generator<T>, maxLength: number): Generator<Array<T>> {
