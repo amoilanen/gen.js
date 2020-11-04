@@ -369,8 +369,50 @@ describe('Generators', () => {
 
       expect(generator.generate()).to.eql(none);
     });
+  });
 
-    //TODO: Negative length - none
+  describe('arrayOf', () => {
+
+    const value = 3;
+    const maxLength = 10;
+
+    it('should generate the array of at most provided length', () => {
+      let valuesCount = 5;
+      expect(valuesCount).to.be.lessThan(maxLength);
+
+      let generator = Generators.arrayOf(Generators.pure(value), maxLength);
+
+      let smallDelta = 1 / (maxLength * 10);
+      sandbox.stub(Math, 'random').returns((valuesCount / maxLength) + smallDelta);
+      expect(generator.generate().get()).to.eql([...Array(valuesCount)].map( _ => value));
+    });
+
+    it('might generate arrays of different lengths on subsequent tries', () => {
+      let generator = Generators.arrayOf(Generators.pure(value), maxLength);
+
+      const random = sandbox.stub(Math, 'random')
+      random.onCall(0).returns(0.11);
+      random.onCall(1).returns(0.21);
+      random.onCall(2).returns(0.31);
+
+      expect(generator.generate().get()).to.eql([ value ]);
+      expect(generator.generate().get()).to.eql([ value, value ]);
+      expect(generator.generate().get()).to.eql([ value, value, value ]);
+    });
+
+    it('should generate empty array if length is zero', () => {
+      let notNoneZeroTimes = Generators.arrayOf(Generators.pure(3), 0);
+      let noneZeroTimes = Generators.arrayOf(Generators.never(), 0);
+
+      expect(notNoneZeroTimes.generate().get()).to.eql([]);
+      expect(noneZeroTimes.generate().get()).to.eql([]);
+    });
+
+    it('should generate none if the length is negative', () => {
+      let generator = Generators.arrayOf(Generators.pure(3), -5);
+
+      expect(generator.generate()).to.eql(none);
+    });
   });
 
   describe('alphaNumString', () => {

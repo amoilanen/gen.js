@@ -218,8 +218,9 @@ export class Generators {
   }
 
   static arrayOf<T>(generator: Generator<T>, maxLength: number): Generator<Array<T>> {
-    //TODO: Implement
-    return null;
+    return Generators.choose(0, maxLength).flatMap(length =>
+      Generators.arrayOfLength(generator, Math.round(length))
+    );
   }
 
   static frequencyOfValues<T>(...valueFrequencies: Array<[number, T]>): Generator<T> {
