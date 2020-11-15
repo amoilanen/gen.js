@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 
-import { Generators } from '../src/generator';
 import { Maybe, Some, none } from '../src/maybe';
 
 const pure = Maybe.pure;

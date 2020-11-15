@@ -4,7 +4,7 @@
   "description": "Data generator library for Typescript/JavaScript",
   "main": "src/index.js",
   "scripts": {
-    "test": "ts-mocha -p ./tsconfig.json spec/**/*.spec.ts"
+    "test": "ts-mocha -p ./tsconfig.json spec/**/**/*.spec.ts"
   },
   "repository": {
     "type": "git",
