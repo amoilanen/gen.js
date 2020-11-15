@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { Generators } from '../src/generator';
+import * as Generators from '../src/generators';
 
 const pure = Generators.pure;
 

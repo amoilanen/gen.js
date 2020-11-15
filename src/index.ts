@@ -1,4 +1,5 @@
-import { Generators, Generator } from './generator';
+import * as Generators from './generators';
+import { Generator } from './generator';
 import { Maybe } from './maybe';
 import { forAll, exists } from './quantifiers';
 
