@@ -1,5 +1,5 @@
-import { Generator } from './generator';
-import * as Generators from './generators';
+import { Generator } from '../generator';
+import * as Generators from '.';
 
 export function asciiCode(char: string): number {
   return char.codePointAt(0);
@@ -39,6 +39,10 @@ export function hexChar(): Generator<string> {
       asciiCode('F')
     )
   );
+}
+
+export function repeat(numberOfTimes: number, stringGenerator: Generator<string>): Generator<string> {
+  return Generators.times(numberOfTimes, stringGenerator).map(_ => _.join(''));
 }
 
 export function concat(...generators: Array<Generator<string>>): Generator<string> {
