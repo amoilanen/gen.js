@@ -1,0 +1,5 @@
+- Add features to be feature complete: inspiration ScalaScheck 1.15.1
+- Get rid of the [..Arr()] repetition
+- Convenience method to avoid calling generate().get() all the time
+
+- Write a script to generate documentation from the source code, and push it to the github.io branch automatically as part of the build process (Travis?)
