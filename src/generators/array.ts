@@ -11,7 +11,6 @@ export function times<T>(timesNumber: number, generator: Generator<T>): Generato
 }
 
 export function nonEmptyArray<T>(generator: Generator<T>, maxSize: number): Generator<Array<T>> {
-  //TODO: Test
   let suffixGenerator = arrayOfLength(generator, maxSize - 1);
   return nTuple(generator, suffixGenerator).map(([first, suffix]: [T, Array<T>]) =>
     [first].concat(suffix)

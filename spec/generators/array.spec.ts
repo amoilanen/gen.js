@@ -128,4 +128,36 @@ describe('array generators', () => {
       expect(generator.generate()).to.eql(none);
     });
   });
+
+  describe('nonEmptyArray', () => {
+    const value = 5;
+
+    it('should generate array of length 1 if maxSize is 1', () => {
+      const generator = Generators.nonEmptyArray(Generators.pure(value), 1);
+      expect(generator.generate().get()).to.eql([value]);
+    });
+
+    it('should always generate an array which size is between 1 and maxSize', () => {
+      const tries = 50;
+      const maxSize = 3;
+      const generator = Generators.nonEmptyArray(Generators.pure(value), maxSize);
+      [...Array(tries)].forEach(_ => {
+        const generated = generator.generate().get();
+        expect(generated.length).to.be.within(1, maxSize);
+        generated.forEach(element =>
+          expect(element).to.eql(value)
+        );
+      });
+    });
+
+    it('should generate none if maxSize is 0', () => {
+      const generator = Generators.nonEmptyArray(Generators.pure(value), 0);
+      expect(generator.generate()).to.eql(none);
+    });
+
+    it('should generate none if maxSize is negative', () => {
+      const generator = Generators.nonEmptyArray(Generators.pure(value), -1);
+      expect(generator.generate()).to.eql(none);
+    });
+  });
 });
