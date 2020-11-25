@@ -70,7 +70,18 @@ describe('string generators', () => {
   describeStringGenerator('hexChar', Generators.hexChar(), /[0-9A-F]/);
   describeStringGenerator('uuid', Generators.uuid(), /[0-9A-F]{8}\-[0-9A-F]{4}\-4[0-9A-F]{3}\-[89AB][0-9A-F]{3}\-[0-9A-F]{12}/); // RFC 4122 compliant UUID
 
-  function describeStringGenerator(generatorName: string, generator: Generator<string>, expectedRegex: RegExp) {
+  describeStringGenerator('identifier', Generators.identifier(5), /[a-z][0-9a-zA-Z]{0,4}/, () => {
+
+    it('should generate none if maxLength is zero', () => {
+      expect(Generators.identifier(0).generate()).to.eql(none);
+    });
+
+    it('should generate a single character if maxLength is one', () => {
+      expect(Generators.identifier(1).generate()).to.match(/[a-z]/);
+    });
+  });
+
+  function describeStringGenerator(generatorName: string, generator: Generator<string>, expectedRegex: RegExp, moreSpecs: () => void = () => {}) {
     describe(generatorName, () => {
       const triesNumber = 10;
 
@@ -87,6 +98,8 @@ describe('string generators', () => {
         const uniqueGeneratedCharacters = new Set(generatedCharacters);
         expect(uniqueGeneratedCharacters.size).to.be.above(1);
       });
+
+      moreSpecs();
     });
   }
 });

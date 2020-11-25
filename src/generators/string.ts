@@ -66,8 +66,13 @@ export function hexString(length: number): Generator<string> {
 }
 
 export function identifier(maxLength: number): Generator<string> {
-  //TODO: Implement
-  return null;
+  return Generators.choose(1, maxLength)
+    .map(len => Math.ceil(len))
+    .flatMap(identifierLength =>
+      Generators.alphaNumString(identifierLength - 1).flatMap(suffix =>
+        Generators.alphaLowerChar().map(prefix => prefix + suffix)
+      )
+    );
 }
 
 /*
