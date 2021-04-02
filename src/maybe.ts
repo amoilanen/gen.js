@@ -1,12 +1,13 @@
-export abstract class Maybe<T> {
-  abstract isDefined: boolean
-  abstract value: T
-  abstract map<U>(f: (value: T) => U): Maybe<U>
-  abstract flatMap<U>(f: (value: T) => Maybe<U>): Maybe<U>
-  get(): T {
-    return this.value;
-  }
-  static pure<U>(value: U): Maybe<U> {
+export interface Maybe<T> {
+  isDefined: boolean;
+  value: T;
+  map<U>(f: (value: T) => U): Maybe<U>;
+  flatMap<U>(f: (value: T) => Maybe<U>): Maybe<U>;
+  get(): T;
+}
+
+export const Maybe = {
+  pure: function<U>(value: U): Maybe<U> {
     if (value !== undefined && value !== null) {
       return new Some(value);
     } else {
@@ -15,11 +16,13 @@ export abstract class Maybe<T> {
   }
 }
 
-export class Some<T> extends Maybe<T> {
+export class Some<T> implements Maybe<T> {
   constructor(readonly value: T) {
-    super();
   }
   isDefined = true
+  get(): T {
+    return this.value;
+  }
   map<U>(f: (value: T) => U): Maybe<U> {
     return new Some(f(this.value));
   }
@@ -28,20 +31,23 @@ export class Some<T> extends Maybe<T> {
   }
 }
 
-export class None<T> extends Maybe<T> {
-  constructor() {
-    super();
-  }
-  get value(): T {
-    throw new Error('None: accessing undefined value');
+export class None<T> implements Maybe<T> {
+  private constructor() {
   }
   isDefined = false
+  get value(): T {
+    return this.get();
+  }
+  get(): T {
+    throw new Error('None: accessing undefined value');
+  }
   map<U>(f: (value: T) => U): Maybe<U> {
-    return none;
+    return None.none;
   }
   flatMap<U>(f: (value: T) => Maybe<U>): Maybe<U> {
-    return none;
+    return None.none;
   }
+  static none: Maybe<any> = new None();
 };
 
-export const none: Maybe<any> = new None();
+export const none: Maybe<any> = None.none;
