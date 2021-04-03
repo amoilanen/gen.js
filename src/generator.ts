@@ -21,4 +21,13 @@ export abstract class Generator<T> {
       }
     });
   }
+
+  static pure<T>(value: T): Generator<T> {
+    let generatedValue = Maybe.pure(value);
+    return new (class extends Generator<T> {
+      generate() {
+        return generatedValue;
+      }
+    })();
+  }
 }

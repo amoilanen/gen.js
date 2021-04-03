@@ -1,5 +1,7 @@
-import { none, Some } from '../maybe';
+import { none } from '../maybe';
 import { Generator } from '../generator';
+
+const pure = Generator.pure;
 
 export function never<T>(): Generator<T> {
   return new (class extends Generator<T> {
@@ -7,16 +9,6 @@ export function never<T>(): Generator<T> {
       return none;
     }
   });
-}
-
-export function pure<T>(value: T): Generator<T> {
-  let generatedValue = new Some(value);
-  return new (class extends Generator<T> {
-
-    generate() {
-      return generatedValue;
-    }
-  })();
 }
 
 export function oneOfValues<T>(...values: Array<T>): Generator<T> {

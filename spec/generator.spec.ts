@@ -1,8 +1,7 @@
 import { expect } from 'chai';
 
 import * as Generators from '../src/generators';
-
-const pure = Generators.pure;
+import { Generator } from '../src/generator';
 
 describe('Generator', () => {
 
@@ -20,9 +19,9 @@ describe('Generator', () => {
 
     it('should produce new Generator', () => {
       let value = 'x';
-      let g = Generators.pure(value);
+      let g = Generator.pure(value);
 
-      expect(g.flatMap(x => Generators.pure(x + x)).generate().get()).to.eql(value + value);
+      expect(g.flatMap(x => Generator.pure(x + x)).generate().get()).to.eql(value + value);
     });
   });
 
@@ -36,25 +35,25 @@ describe('Generator', () => {
     // flatMap(f)(pure) == f
     it('should satisfy the left identity law', () => {
       values.forEach(value => {
-        let f = (x: number) => pure(2 * x);
-        expect(pure(value).flatMap(f).generate()).to.eql(f(value).generate());
+        let f = (x: number) => Generator.pure(2 * x);
+        expect(Generator.pure(value).flatMap(f).generate()).to.eql(f(value).generate());
       });
     });
 
     // m.flatMap(pure) == m
     it('should satisfy the right identity law', () => {
       values.forEach(value => {
-        let m = pure(value)
-        expect(m.flatMap(pure).generate()).to.eql(m.generate());
+        let m = Generator.pure(value)
+        expect(m.flatMap(Generator.pure).generate()).to.eql(m.generate());
       });
     });
 
     // m.flatMap(f).flatMap(g) == m.flatMap(flatMap(g)(f))
     it('should satisfy the associativity law', () => {
       values.forEach(value => {
-        let f = (x: number) => pure(2 * x);
-        let g = (x: number) => pure(x * x);
-        let m = pure(value);
+        let f = (x: number) => Generator.pure(2 * x);
+        let g = (x: number) => Generator.pure(x * x);
+        let m = Generator.pure(value);
 
         let leftSide = m.flatMap(f).flatMap(g);
         let rightSide = m.flatMap(x => f(x).flatMap(g));
