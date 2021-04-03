@@ -3,12 +3,10 @@ import { Generator } from '../generator';
 
 const pure = Generator.pure;
 
+const neverGenerator: Generator<any> = pure(null);
+
 export function never<T>(): Generator<T> {
-  return new (class extends Generator<T> {
-    generate() {
-      return none;
-    }
-  });
+  return neverGenerator;
 }
 
 export function oneOfValues<T>(...values: Array<T>): Generator<T> {

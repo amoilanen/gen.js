@@ -20,7 +20,7 @@ describe('object generators', () => {
     const populationGenerator = Generators.pure(population);
     const area = 10;
     const areaGenerator = Generators.pure(area);
-    const empty = Generators.never();
+    const never = Generators.never;
 
     it('should generate value if all the used generators generate values', () => {
       const expected = new City(name, population, area);
@@ -28,11 +28,11 @@ describe('object generators', () => {
     });
 
     it('should generate none when one of the used generated generators generates none', () => {
-      expect(Generators.object(City, nameGenerator, empty, areaGenerator).generate()).to.eql(none);
+      expect(Generators.object(City, nameGenerator, never<number>(), areaGenerator).generate()).to.eql(none);
     });
 
     it('should generate none when all of the used generated generators generate none', () => {
-      expect(Generators.nTuple(empty, empty, empty).generate()).to.eql(none);
+      expect(Generators.object(City, never<string>(), never<number>(), never<number>()).generate()).to.eql(none);
     });
   });
 });

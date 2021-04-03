@@ -7,10 +7,10 @@ describe('ntuple generators', () => {
 
   describe('nTuple', () => {
 
+    const empty = Generators.never<number>();
     const g1 = Generators.pure(1);
     const g2 = Generators.pure(2);
     const g3 = Generators.pure(3);
-    const empty = Generators.never();
 
     it('should generate value if all the used generators generate values', () => {
       expect(Generators.nTuple(g1, g2, g3).generate().get()).to.eql([1, 2, 3]);
