@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { SinonSandbox, createSandbox } from 'sinon';
 
 import { none, Some } from '../../src/maybe';
+import { Lazy } from '../../src/lazy';
 import { Generator } from '../../src';
 import { Generators } from '../../src';
 
@@ -182,6 +183,25 @@ describe('core generators', () => {
       const generator = Generators.frequencyOfValues([0.3, 1], [0.3, 2], [0.4, 3]);
       sandbox.stub(Math, 'random').returns(0.5);
       expect(generator.generate().get()).to.eql(2);
+    });
+  });
+
+  describe('recursive', () => {
+
+    it('should generate value while recursion is not finished', () => {
+      let counter = 0;
+      const maxCounter = 5;
+      const generator = Generators.recursive<string>((recurse: Lazy<Generator<string>>) => {
+        counter = counter + 1;
+        console.log(`counter = ${counter}`);
+        if (counter <= maxCounter) {
+          const currentCounterValue = counter;
+          return recurse.force().map(_ => _ + currentCounterValue.toString());
+        } else {
+          return Generators.pure('$');
+        }
+      });
+      expect(generator.generate().get()).to.eql('$54321');
     });
   });
 });

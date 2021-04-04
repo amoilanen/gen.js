@@ -1,4 +1,5 @@
 import { Maybe, Some, none } from '../maybe';
+import { Lazy } from '../lazy';
 import { Generator } from '../generator';
 
 const pure = Generator.pure;
@@ -108,4 +109,8 @@ export function frequency<T>(...generatorFrequences: Array<[number, Generator<T>
   } else {
     return never();
   }
+}
+
+export function recursive<T>(block: (recurse: Lazy<Generator<T>>) => Generator<T>): Generator<T> {
+  return block(new Lazy(() => recursive(block)));
 }
