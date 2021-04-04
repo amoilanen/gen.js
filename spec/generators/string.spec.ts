@@ -85,18 +85,18 @@ describe('string generators', () => {
     describe(generatorName, () => {
       const triesNumber = 10;
 
-      const generatedCharacters = [...Array(triesNumber)].map(_ =>
+      const generatedStrings = [...Array(triesNumber)].map(_ =>
         generator.generate()
       );
   
       it(`should generate strings matching ${expectedRegex}`, () => {
-        expect(generatedCharacters.every(char => char.isDefined)).to.be.true;
-        expect(generatedCharacters.every(char => expectedRegex.test(char.get()))).to.be.true;
+        expect(generatedStrings.every(char => char.isDefined)).to.be.true;
+        expect(generatedStrings.every(char => expectedRegex.test(char.get()))).to.be.true;
       });
   
       it('should generate different strings', () => {
-        const uniqueGeneratedCharacters = new Set(generatedCharacters);
-        expect(uniqueGeneratedCharacters.size).to.be.above(1);
+        const uniqueGeneratedStrings = new Set(generatedStrings);
+        expect(uniqueGeneratedStrings.size).to.be.above(1);
       });
 
       moreSpecs();
