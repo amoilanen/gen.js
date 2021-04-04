@@ -16,25 +16,25 @@ const digitsASCIIEnd = asciiCode('9');
 
 export function asciiRange(from: number, to: number): Generator<string> {
   return Generators.choose(from, to)
-    .map(charCode => String.fromCharCode(charCode))
+    .map(value => String.fromCharCode(Math.ceil(value)))
 }
 
 export function alphaChar(): Generator<string> {
-  return Generators.oneOf(this.alphaLowerChar(), this.alphaUpperChar());
+  return Generators.oneOf(alphaLowerChar(), alphaUpperChar());
 }
 
 export function alphaLowerChar(): Generator<string> {
-  return this.asciiRange(lettersASCIIStart, lettersASCIIEnd);
+  return asciiRange(lettersASCIIStart, lettersASCIIEnd);
 }
 
 export function alphaUpperChar(): Generator<string> {
-  return this.asciiRange(capitalLettersASCIIStart, capitalLettersASCIIEnd);
+  return asciiRange(capitalLettersASCIIStart, capitalLettersASCIIEnd);
 }
 
 export function hexChar(): Generator<string> {
   return Generators.oneOf(
-    this.numChar(),
-    this.asciiRange(
+    numChar(),
+    asciiRange(
       asciiCode('A'),
       asciiCode('F')
     )
@@ -50,27 +50,27 @@ export function concat(...generators: Array<Generator<string>>): Generator<strin
 }
 
 export function numChar(): Generator<string> {
-  return this.asciiRange(digitsASCIIStart, digitsASCIIEnd);
+  return asciiRange(digitsASCIIStart, digitsASCIIEnd);
 }
 
 export function alphaNumChar(): Generator<string> {
-  return Generators.oneOf(this.alphaChar(), this.numChar());
+  return Generators.oneOf(alphaChar(), numChar());
 }
 
 export function alphaNumString(length: number): Generator<string> {
-  return Generators.repeat(length, this.alphaNumChar());
+  return repeat(length, alphaNumChar());
 }
 
 export function hexString(length: number): Generator<string> {
-  return Generators.repeat(length, this.hexChar());
+  return repeat(length, hexChar());
 }
 
 export function identifier(maxLength: number): Generator<string> {
   return Generators.choose(1, maxLength)
     .map(len => Math.ceil(len))
     .flatMap(identifierLength =>
-      Generators.alphaNumString(identifierLength - 1).flatMap(suffix =>
-        Generators.alphaLowerChar().map(prefix => prefix + suffix)
+      alphaNumString(identifierLength - 1).flatMap(suffix =>
+        alphaLowerChar().map(prefix => prefix + suffix)
       )
     );
 }
@@ -83,11 +83,11 @@ export function uuid(): Generator<string> {
   const variant = Generators.oneOfValues('8', '9', 'A', 'B');
 
   const blocks: Array<Generator<string>> = [
-    this.hexString(8),
-    this.hexString(4),
-    this.hexString(3).map(_ => `${uuidVersion}${_}`),
-    this.hexString(3).flatMap(_ => variant.map(v => `${v}${_}`)),
-    this.hexString(12)
+    hexString(8),
+    hexString(4),
+    hexString(3).map(_ => `${uuidVersion}${_}`),
+    hexString(3).flatMap(_ => variant.map(v => `${v}${_}`)),
+    hexString(12)
   ];
   return Generators.nTuple(...blocks).map(_ => _.join('-'));
 }

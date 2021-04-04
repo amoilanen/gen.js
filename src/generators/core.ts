@@ -1,4 +1,4 @@
-import { none } from '../maybe';
+import { Maybe, Some, none } from '../maybe';
 import { Generator } from '../generator';
 
 const pure = Generator.pure;
@@ -22,8 +22,7 @@ export function sequenceOfValues<T>(...values: Array<T>): Generator<T> {
 export function oneOf<T>(...generators: Array<Generator<T>>): Generator<T> {
   return new (class extends Generator<T> {
 
-    generate() {
-      let generated = none;
+    private chooseRandomGenerator(): Maybe<Generator<T>> {
       const length = generators.length;
       if (length > 0) {
         let randomIndex = Math.floor(Math.min(
@@ -31,9 +30,14 @@ export function oneOf<T>(...generators: Array<Generator<T>>): Generator<T> {
           length - 1
         ));
         let randomGenerator = generators[randomIndex];
-        generated = randomGenerator.generate();
+        return new Some(randomGenerator);
+      } else {
+        return none;
       }
-      return generated;
+    }
+
+    generate() {
+      return this.chooseRandomGenerator().flatMap(g => g.generate());
     }
   })();
 }
@@ -42,13 +46,17 @@ export function sequenceOf<T>(...values: Array<Generator<T>>): Generator<T> {
   return new (class extends Generator<T> {
     idx: number = -1;
 
-    generate() {
+    private nextGenerator(): Maybe<Generator<T>> {
       if (values.length > 0) {
         this.idx = (this.idx + 1) % values.length;
-        return values[this.idx].generate();
+        return new Some(values[this.idx]);
       } else {
         return none;
       }
+    }
+
+    generate() {
+      return this.nextGenerator().flatMap(g => g.generate());
     }
   })();
 }
@@ -80,7 +88,7 @@ function randomIndexWithProbabilityDistribution(probabilities: Array<number>): n
 }
 
 export function frequency<T>(...generatorFrequences: Array<[number, Generator<T>]>): Generator<T> {
-  generatorFrequences = generatorFrequences.filter(frequency => frequency[0] > 0);
+  generatorFrequences = generatorFrequences.filter(([frequency, _]) => frequency > 0);
   if (generatorFrequences.length > 0) {
     const frequencies = generatorFrequences.map(([frequency, _]) => frequency);
     const generators = generatorFrequences.map(([_, generator]) => generator);
