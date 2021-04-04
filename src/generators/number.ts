@@ -1,19 +1,14 @@
-import { Maybe, none } from '../maybe';
+import { Some, none } from '../maybe';
 import { Generator } from '../generator';
 
 export function choose(min: number, max: number): Generator<number> {
   return new (class extends Generator<number> {
-
-    constructor(readonly min: number, readonly max: number) {
-      super();
-    }
-
     generate() {
-      if (this.max < this.min) {
+      if (max < min) {
         return none;
       } else {
-        return Maybe.pure<number>(Math.random() * (this.max - this.min) + this.min);
+        return new Some<number>(Math.random() * (max - min) + min);
       }
     }
-  })(min, max);
+  });
 }
